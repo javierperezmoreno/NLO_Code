@@ -1,0 +1,103 @@
+clear 'all'
+
+%Enter Parameters
+% latL = lattice length
+% nInt = number of interpolation points
+% step = distance between interpolation points
+
+latL=10;
+nInt=4001;
+step=latL/(nInt-1);
+mfact=1/step^2;
+
+% constructing the x-vector, storing all the interpolation points 
+x=linspace(-latL/2,latL/2,nInt);
+
+% constructing the potential-vector
+for i=1:nInt,pot(i)=exp(-x(i)); end;
+
+% constructing the trigonal matrix
+mauxdiag=diag(pot);
+finmat=mfact*(2*eye(nInt)+diag(-1*ones(nInt-1,1),1)+diag(-1*ones(nInt-1,1),-1))+mauxdiag;
+
+% solving for eigenvalues and eigenfuctions
+[wavevector,eigenmat]=eig(finmat);
+eigenvalues=diag(eigenmat);
+
+% Storing the first eigenvalues
+firsteigenvalues=eigenvalues(1:100);
+
+% Storing the first 100 wavefunctions
+wavefunctions=wavevector(:,1:100);
+
+% Checking Orthonormality
+for i=1:100
+    for j=1:100
+        orthocheck(i,j)=dot(wavevector(:,i),wavevector(:,j));
+    end;
+end;
+	
+%calculating the transition dipole moments
+for i=1:100
+    for j=1:100
+       xtr(i,j)=0;
+    end;
+end;
+
+for i=1:100
+    for j=1:100
+        for k=1:nInt
+        xtr(i,j)=xtr(i,j)+wavevector(k,i)*x(k)*wavevector(k,j);   
+        end;
+    end ;
+end;
+ 
+
+
+% Now we can compute the off-resonance first hyperpolarizability
+firstc=0.;
+secondc=0.;
+for i=2:100
+    for j=2:100
+        if i==j
+           transitions(i,j)=xtr(1,i)*(xtr(i,i)-xtr(1,1))*xtr(i,1);
+        else
+           transitions(i,j)=xtr(1,i)*xtr(i,j)*xtr(j,1);
+        end;
+    end;
+end;
+      
+	
+
+% off-resonance beta
+betaoff=firstc-secondc
+
+% Calculating combinations of transition dipole moments
+for i=2:100
+    for j=2:100
+        eproduct=(firsteigenvalues(i)-firsteigenvalues(1))*(firsteigenvalues(j)-firsteigenvalues(1));
+        dispersion(i,j)=transitions(i,j)/eproduct;
+    end;
+end;
+
+        
+
+
+% Calculating the dispersion factors
+for i=2:20
+    betapart(i)=0;
+end;
+for i=2:20
+    for j=2:i
+        for k=2:i
+            betapart(i)=betapart(i)+dispersion(j,k);
+        end;
+    end;
+end;
+
+
+% Normalizing Eigenfunctions
+
+for i = 1:100
+    firsteigenfunc(i) = firsteigenvalues(i)/sqrt(step);
+end;
