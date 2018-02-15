@@ -1,0 +1,42 @@
+# MainCode11Nov2017.py
+#
+# Models the MATLAB code that calculates eigenvalues, eigenfunctions, and
+# several other characteristics of the wavefunction
+# Updates: None
+# Written by Joshua Hannan
+# 11 November 2017
+#################################################################################
+
+import numpy as np
+from math import exp
+from numpy import *
+import scipy.linalg
+
+# Parameters for simulation
+
+print('What is the lattice length? (Default is 10)')
+latLen = int(input()) # lattice length
+
+print('What is the number of interpolation points? (Default is 4001)')
+numInt = int(input()) # number of interpolation points
+
+stepSize = latLen/(numInt - 1) # distance between the interpolation points
+mfact = 1/(stepSize**2)
+
+#Construct the x-vector in accordance with the number of interpolation points
+x = np.linspace(-latLen/2,latLen/2,numInt)
+
+#Define the potential function
+
+pot = np.zeros(numInt) #Create an empty vector for the potential values
+
+i=int(0)
+for count in range(0, numInt):
+    pot[i] = exp(-x[i])
+    i += 1
+
+#Construct the trigonal matrix
+mauxdiag = diag(pot)
+
+## Currently is a problem with this part here...
+finmat = mfact*(2*eye(numInt) + diag(-1*ones((numInt,1)),1) + diag(-1*ones((numInt,1)),-1)) + mauxdiag
