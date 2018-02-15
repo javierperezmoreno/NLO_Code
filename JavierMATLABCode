@@ -12,7 +12,7 @@ mfact=1/step^2; % normalization factor
 x=linspace(-latL/2,latL/2,nInt);
 
 % constructing the potential-vector for each interpolation point
-% each potential-vector value is e raised to the corresponding linspace
+% This will be the user input 
 % value
 for i=1:nInt
     pot(i)=exp(-x(i)); 
