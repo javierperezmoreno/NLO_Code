@@ -1,0 +1,49 @@
+from __future__ import division, print_function
+import numpy as np
+import matplotlib.pyplot as plt
+import math
+from math import exp
+
+# Defining variables:
+# latL = lattice length
+# nInt = number of interpolation points
+# step = distance between interpolation points
+
+latL = 400
+nInt = 4001
+step = latL/(nInt-1)
+mfact = 1/(math.pow(step,2))
+
+# construction x-vector
+
+x = np.linspace(-latL/2, latL/2, nInt)
+
+# HERE IS WHERE POTENTIAL FUNCTION IS DEFINED
+pot = np.zeros(nInt)
+for i in range(nInt):
+    pot[i] = exp(-x[i])
+
+plt.figure(1)
+plt.plot(x,pot)
+
+# Constructing trigonal matrix
+
+mauxdiag = np.diag(pot)
+finmat = mfact*(2*np.identity(nInt) + np.diag(-1*np.ones(nInt-1,1)) + mauxdiag)
+
+# Solving for eigenvalues and eigenfunctions
+[wavevector, eigenmat] = np.linalg.ein(finmat)
+eigenvalues = np.diag(eigenmat)
+
+# Storing the first eigenvalues
+firsteigenvalues = 0
+ii = 1
+while ii < 100:
+    firsteigenvalues[ii] = eigenvalues[ii]
+
+plt.figure(2)
+plt.plot(firsteigenvalues)
+
+# Storing first wavefunctions
+
+
