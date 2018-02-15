@@ -20,30 +20,42 @@ for i=1:nInt,pot(i)=exp(-x(i)); end;
 mauxdiag=diag(pot);
 finmat=mfact*(2*eye(nInt)+diag(-1*ones(nInt-1,1),1)+diag(-1*ones(nInt-1,1),-1))+mauxdiag;
 
-% solving for eigenvalues and eigenfuctions
+% solving for eigenvalues and eigenfuctions:
+% As trigonal matrix is constructed, it is possible to use eig() function, which results in 
+% eigenmat - diagonal matrix of eigenvalues and wavevector - a  matrix  whose columns are 
+% the corresponding right eigenvectors. Then, function diag() is used to get the diagonal 
+% elements from the eigenmat digonal matrix.
 [wavevector,eigenmat]=eig(finmat);
 eigenvalues=diag(eigenmat);
 
-% Storing the first eigenvalues
+% Storing the first 100 eigenvalues since only the initial wavefunctions have a strong effect
 firsteigenvalues=eigenvalues(1:100);
 
-% Storing the first 100 wavefunctions
+% Each eigenvalue has a corresponding wavevector that stores the values of a wavefunction at a
+% particular interpolation point. Since there are 100 eigenvalues, first 100 wavefunctions are
+% taken from the whole vector. 
 wavefunctions=wavevector(:,1:100);
 
-% Checking Orthonormality
+% Following nested for loop checks for orthonormality by taking a dot product of all wavevectors 
+% in a matrix. Dot product will be zero for different wavevectors and will be 1 if i=j. If wavevectors
+% are orhocheck(i,j) will result in a diagonal matrix with values 1 on diagonal and 0 everywhere else.
 for i=1:100
     for j=1:100
         orthocheck(i,j)=dot(wavevector(:,i),wavevector(:,j));
     end;
 end;
 	
-%calculating the transition dipole moments
+% calculating the transition dipole moments. Following nested for loop is only required to 
+% initialize dipole moment matrix. 
 for i=1:100
     for j=1:100
        xtr(i,j)=0;
     end;
 end;
 
+% This nested loop with 3 for statements calculates transition dipole moments by taking on each interpolation point
+% at a time. For each point a wavevector is multiplied by another wavevector and by x-coordinate of the interpolation point.
+% This process is repeated for all 100 wavevectors. 
 for i=1:100
     for j=1:100
         for k=1:nInt
@@ -54,7 +66,8 @@ end;
  
 
 
-% Now we can compute the off-resonance first hyperpolarizability
+% Now an off-resonance first hyperpolarizability can be computed from transition dipole moments
+%
 firstc=0.;
 secondc=0.;
 for i=2:100
@@ -97,7 +110,9 @@ end;
 
 
 % Normalizing Eigenfunctions
-
 for i = 1:100
-    firsteigenfunc(i) = firsteigenvalues(i)/sqrt(step);
+    normeigenfunc(i) = 0
+end;
+for i = 1:100
+    normeigenfunc(i) = wavevector(i)/sqrt(step);
 end;
