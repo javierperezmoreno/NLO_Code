@@ -12,14 +12,17 @@ mfact=1/step^2; % normalization factor
 x=linspace(-latL/2,latL/2,nInt);
 
 % constructing the potential-vector for each interpolation point
-% each potential-vector value is e raised to the corresponding linspace
-% value
+% This will usually be the input from the user
+% The user proposes a potential V(x) and the code figures out Beta for that potential 
+% We need to find the value of the potential at each interpolation point
+% pot(i) is the value of the potential function at the interpolation point i
+% In this test, we are trying the potential function V(x) = exp(-x).
 for i=1:nInt
     pot(i)=exp(-x(i)); 
 end;
 
 % constructing the trigonal matrix
-% Creates an identity matrix that represents d^2(Phi)/d(a)^2
+% Creates an identity matrix that represents d^2(Phi)/d(a)^2 a
 % Diagonals are: 1/d^2, v^(i)-2/d^2, and 1/d^2
 % Everyhwere else is 0
 mauxdiag=diag(pot);
